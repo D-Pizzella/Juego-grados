@@ -17,12 +17,12 @@
             height: 100vh;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
-            padding: 1.25rem; /* Añadir un padding global */
+            padding: 1.25rem;
         }
         .container {
             text-align: center;
             background-color: #fff;
-            padding: 1.875rem 1.25rem; /* Aumentar el padding superior */
+            padding: 1.875rem 1.25rem;
             border-radius: .625rem;
             box-shadow: 0 0 .625rem rgba(0, 0, 0, 0.1);
             width: 100%;
@@ -30,7 +30,7 @@
         }
         .compass {
             position: relative;
-            margin: 2.5rem 0 6.75rem 0;
+            margin: 2.5rem 0 3.75rem 0;
             width: 12.5rem;
             height: 12.5rem;
             background-size: cover;
@@ -48,7 +48,6 @@
             background-color: red;
             border-radius: .3125rem;
         }
-        /* Nueva flecha en la punta del indicador */
         .arrow:after {
             content: "";
             position: absolute;
@@ -79,16 +78,30 @@
         .slider {
             width: 100%;
         }
+        .difficulty {
+            margin-bottom: 1.25rem;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>Juego Rosa de los Vientos</h2>
+        
+        <!-- Selector de dificultad -->
+        <div class="difficulty">
+            <label for="difficulty">Selecciona dificultad:</label>
+            <select id="difficulty" onchange="changeDifficulty()">
+                <option value="1">Difícil (grados completos)</option>
+                <option value="5">Intermedio (saltos de 5°)</option>
+                <option value="10">Fácil (saltos de 10°)</option>
+            </select>
+        </div>
+        
         <div class="compass">
             <div id="arrow" class="arrow"></div>
         </div>
-        
+
         <!-- Input para la primera versión del juego (grados correctos a ingresar) -->
         <input type="number" id="userDegrees" placeholder="Ingresa los grados (0-360)">
         <button onclick="checkAnswer()">Enviar</button>
@@ -105,11 +118,32 @@
     </div>
 
     <script>
-        // Variables para la primera versión
-        let correctDegrees = Math.floor(Math.random() * 361);
+        let correctDegrees;
+        let targetDegrees;
+        let step = 1;
         const arrow = document.getElementById("arrow");
-        arrow.style.transform = `translate(-50%, -50%) rotate(${correctDegrees}deg)`;
+        const slider = document.getElementById("slider");
+        const degreesToShow = document.getElementById("degreesToShow");
 
+        // Inicializar valores para la dificultad seleccionada
+        function changeDifficulty() {
+            const difficulty = parseInt(document.getElementById("difficulty").value);
+            step = difficulty;
+            slider.step = difficulty; // Cambiar los pasos del slider
+            resetGame();
+        }
+
+        // Resetear el juego con nuevos valores
+        function resetGame() {
+            correctDegrees = Math.floor(Math.random() * (360 / step)) * step;
+            targetDegrees = Math.floor(Math.random() * (360 / step)) * step;
+
+            // Actualizar la interfaz
+            arrow.style.transform = `translate(-50%, -50%) rotate(${correctDegrees}deg)`;
+            degreesToShow.textContent = targetDegrees;
+        }
+
+        // Comprobar la respuesta del primer juego
         function checkAnswer() {
             const userDegrees = parseInt(document.getElementById("userDegrees").value);
             const resultDiv = document.getElementById("result");
@@ -129,18 +163,7 @@
             `;
         }
 
-        // Variables para la segunda versión del juego
-        let targetDegrees = Math.floor(Math.random() * 361);
-        const degreesToShow = document.getElementById("degreesToShow");
-        degreesToShow.textContent = targetDegrees;
-
-        const slider = document.getElementById("slider");
-
-        slider.addEventListener("input", function() {
-            // Actualizar la rotación de la flecha con el movimiento del slider
-            arrow.style.transform = `translate(-50%, -50%) rotate(${slider.value}deg)`;
-        });
-
+        // Comprobar la respuesta del segundo juego
         function checkSliderAnswer() {
             const userSliderDegrees = parseInt(slider.value);
             const sliderResultDiv = document.getElementById("sliderResult");
@@ -154,6 +177,14 @@
                 <p>Diferencia: ${minDifference}°</p>
             `;
         }
+
+        // Iniciar con dificultad difícil por defecto
+        changeDifficulty();
+
+        // Actualizar la flecha en el segundo juego cuando el slider cambie
+        slider.addEventListener("input", function() {
+            arrow.style.transform = `translate(-50%, -50%) rotate(${slider.value}deg)`;
+        });
     </script>
 
 </body>
