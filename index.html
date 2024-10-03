@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego Rosa de los Vientos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            padding: 1.25rem; /* Añadir un padding global */
+        }
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 1.875rem 1.25rem; /* Aumentar el padding superior */
+            border-radius: .625rem;
+            box-shadow: 0 0 .625rem rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 25rem;
+        }
+        .compass {
+            position: relative;
+            margin: 2.5rem 0 3.75rem 0; /* Aumentar margen inferior */
+            width: 12.5rem;
+            height: 12.5rem;
+            background-size: cover;
+            margin-left: auto;
+            margin-right: auto; /* Centrar */
+        }
+        .arrow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: translate(-50%, -50%) rotate(0deg);
+            width: .625rem;
+            height: 6.25rem; /* Aumentar altura del palo */
+            background-color: red;
+            border-radius: .3125rem;
+        }
+        /* Nueva flecha en la punta del indicador */
+        .arrow:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            width: 0;
+            height: 0;
+            border-left: .625rem solid transparent;
+            border-right: .625rem solid transparent;
+            border-bottom: 1.25rem solid red;
+        }
+        input, button {
+            padding: .625rem;
+            margin: .625rem 0;
+            width: 100%;
+            border: .0625rem solid #ccc;
+            border-radius: .3125rem;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: .625rem;
+        }
+        .slider {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Juego Rosa de los Vientos</h2>
+        <div class="compass">
+            <div id="arrow" class="arrow"></div>
+        </div>
+        
+        <!-- Input para la primera versión del juego (grados correctos a ingresar) -->
+        <input type="number" id="userDegrees" placeholder="Ingresa los grados (0-360)">
+        <button onclick="checkAnswer()">Enviar</button>
+
+        <div id="result" class="result"></div>
+
+        <h3>Segunda Versión del Juego</h3>
+        <!-- Segunda versión: El usuario debe mover la flecha -->
+        <p>Grados a indicar: <span id="degreesToShow"></span>°</p>
+        <input type="range" min="0" max="360" value="0" id="slider" class="slider">
+        <button onclick="checkSliderAnswer()">Verificar dirección</button>
+
+        <div id="sliderResult" class="result"></div>
+    </div>
+
+    <script>
+        // Variables para la primera versión
+        let correctDegrees = Math.floor(Math.random() * 361);
+        const arrow = document.getElementById("arrow");
+        arrow.style.transform = `translate(-50%, -50%) rotate(${correctDegrees}deg)`;
+
+        function checkAnswer() {
+            const userDegrees = parseInt(document.getElementById("userDegrees").value);
+            const resultDiv = document.getElementById("result");
+
+            if (isNaN(userDegrees) || userDegrees < 0 || userDegrees > 360) {
+                resultDiv.textContent = "Por favor, ingresa un valor válido entre 0 y 360.";
+                return;
+            }
+
+            const difference = Math.abs(correctDegrees - userDegrees);
+            const minDifference = Math.min(difference, 360 - difference);
+
+            resultDiv.innerHTML = `
+                <p>Grados correctos: ${correctDegrees}°</p>
+                <p>Tu respuesta: ${userDegrees}°</p>
+                <p>Diferencia: ${minDifference}°</p>
+            `;
+        }
+
+        // Variables para la segunda versión del juego
+        let targetDegrees = Math.floor(Math.random() * 361);
+        const degreesToShow = document.getElementById("degreesToShow");
+        degreesToShow.textContent = targetDegrees;
+
+        const slider = document.getElementById("slider");
+
+        slider.addEventListener("input", function() {
+            // Actualizar la rotación de la flecha con el movimiento del slider
+            arrow.style.transform = `translate(-50%, -50%) rotate(${slider.value}deg)`;
+        });
+
+        function checkSliderAnswer() {
+            const userSliderDegrees = parseInt(slider.value);
+            const sliderResultDiv = document.getElementById("sliderResult");
+
+            const difference = Math.abs(targetDegrees - userSliderDegrees);
+            const minDifference = Math.min(difference, 360 - difference);
+
+            sliderResultDiv.innerHTML = `
+                <p>Grados mostrados: ${targetDegrees}°</p>
+                <p>Tu respuesta: ${userSliderDegrees}°</p>
+                <p>Diferencia: ${minDifference}°</p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
